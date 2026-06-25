@@ -1,0 +1,4 @@
+﻿interface:
+  display_name: "Prototype Builder"
+  short_description: "Generate and iterate interactive multi-page HTML prototypes"
+  default_prompt: "请先执行最少问题集并按需追问，然后基于确认结果构建纯 HTML 多页面主链路原型，覆盖页面跳转、表单校验、状态反馈，并给出测试步骤。"
