@@ -36,6 +36,8 @@ Provide a reusable baseline layout for product prototype pages:
 16. Keep inline edit stable: no immediate collapse after one click; only `Save`/`Cancel`/`Delete` should close edit mode.
 17. Top action row labels must be fully visible in default desktop layout; do not truncate `Save HTML`.
 18. Center canvas content area is the full prototype viewport and must not show horizontal or vertical scrollbars.
+19. If prototype content is visually clipped, expand center work area first (increase center column space and/or reduce side columns within usable limits) instead of changing restored page geometry.
+20. In Figma restore mode, visual art resources must use Figma assets (MCP URLs or exported files) only; do not create substitute icons/illustrations/photos manually.
 
 ## Source-of-truth contract
 

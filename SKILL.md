@@ -1,6 +1,6 @@
 ---
 name: prototype-builder
-description: Build and iterate interactive web prototypes for product managers. Use this skill to turn product ideas into runnable pure HTML/CSS/JS multi-page main-flow prototypes with reusable left-side page tabs and right-side annotation capabilities, plus page navigation, form validation, state feedback, and testable task flows. When information is missing, run a minimum question set first and ask follow-up questions only as needed.
+description: Build and iterate interactive web prototypes for product managers. Use this skill to turn product ideas into runnable pure HTML/CSS/JS multi-page main-flow prototypes with reusable left-side page tabs and right-side annotation capabilities, plus page navigation, form validation, state feedback, and testable task flows. Also use this skill when the user pastes a Figma link and asks for 1:1 restoration in the center canvas via Figma MCP. When information is missing, run a minimum question set first and ask follow-up questions only as needed.
 ---
 
 # Prototype Builder
@@ -30,6 +30,7 @@ Collect at least:
 6. Device scope: desktop, mobile, or both.
 7. Visual preference and prohibited style choices.
 8. Scope and priority boundary for MVP.
+9. If user provides a Figma link, confirm target node/page and required restoration scope (full page or center canvas only).
 
 Ask follow-up questions only for missing details that block implementation.
 
@@ -43,6 +44,43 @@ Use [references/discovery-question-bank.md](references/discovery-question-bank.m
 4. Wire: implement navigation, validation, and state feedback.
 5. Self-test: execute main-flow checks and fix blockers.
 6. Deliver: provide run steps, page map, test cases, and known limits.
+
+### Environment Bootstrap Workflow
+
+When task requires Figma MCP in Codex CLI environment:
+
+1. Check whether `codex` command is available.
+2. If `codex` is missing, install Codex CLI first according to the local environment.
+3. Run `codex mcp add figma --url https://mcp.figma.com/mcp`.
+4. Verify registration with `codex mcp list` and confirm `figma` exists.
+5. If bootstrap fails, report exact command error and provide retry steps.
+
+### Screenshot 1:1 Mode Workflow
+
+When user asks to restore prototype from screenshots, use this mode:
+
+1. Lock canvas size to screenshot pixel size (for example 1920x1080) before building.
+2. Build a layout skeleton first (major blocks and coordinates), then fill typography and controls.
+3. Use pixel values from screenshot geometry, avoid `%` for key spacing and key component sizes.
+4. Keep one page per screenshot and name pages by screenshot sequence.
+5. Run visual diff self-check and adjust until major blocks align.
+
+### Figma Link 1:1 Restore Workflow
+
+When user pastes a Figma URL and asks for 1:1 restoration, run this workflow:
+
+1. Parse URL and extract `fileKey` and `nodeId` when available.
+2. Use Figma MCP as the source of truth for structure, spacing, and styles.
+3. If Figma MCP is not available, run bootstrap workflow first, then retry.
+4. Read design context from target node, then map structure into prototype center canvas only.
+5. Keep default left-page-tab and right-annotation framework unchanged unless user disables it.
+6. Enforce canvas viewport parity with Figma frame size using explicit px values.
+7. Reproduce major blocks and key controls in center canvas with target tolerance <= 2 px.
+8. If exact local font is missing, use nearest fallback and record deviation in delivery notes.
+9. Validate center canvas has no horizontal or vertical scrollbar in default desktop layout.
+10. If multiple Figma pages/nodes are provided, generate one prototype page per node by default.
+11. If center canvas cannot fully present the restored node, expand center panel width first (before shrinking/restyling target UI), while keeping left tabs and right annotations usable.
+12. For visual assets in restored area (icons, illustrations, photos, masks, logos), use Figma-provided assets/URLs only; do not invent replacement art.
 
 ## Implementation Standard
 
@@ -78,13 +116,33 @@ Use [references/discovery-question-bank.md](references/discovery-question-bank.m
 30. Enforce pre-delivery interaction check: after resize (horizontal and vertical), marker-to-content relative position must remain stable.
 31. Ensure top action row buttons are fully visible in default desktop layout; no truncation of labels such as `Save HTML`.
 32. Treat center canvas as full prototype viewport: disallow horizontal and vertical scrollbars in the canvas content area.
+33. If screenshot 1:1 mode is requested, prioritize structural and visual parity over generic component reuse.
+34. In screenshot 1:1 mode, define viewport, sidebar width, header height, card size, and key offsets with explicit pixels.
+35. In screenshot 1:1 mode, preserve screenshot page information architecture exactly; do not merge pages unless user asks.
+36. In screenshot 1:1 mode, allowed deviation target is <= 2 px on major block edges and <= 1 px on icon/button size when practical.
+37. In screenshot 1:1 mode, if fonts are unavailable locally, choose the nearest fallback and record the gap in delivery notes.
+38. In screenshot 1:1 mode, do not remove the default left-page-tab and right-annotation framework unless the user explicitly disables it.
+39. If screenshot parity conflicts with framework structure, keep the framework and apply 1:1 restoration only inside the center canvas area.
+40. If Figma MCP is required, ensure Codex CLI is ready and register Figma MCP using `codex mcp add figma --url https://mcp.figma.com/mcp`.
+41. Always verify MCP registration result with `codex mcp list` after add/update operations.
+42. If user provides a Figma link, prioritize Figma MCP driven restoration over screenshot-only inference.
+43. For Figma-link tasks, implement 1:1 restoration in center canvas first, then adapt peripheral framework.
+44. For Figma-link tasks, treat Figma frame dimensions as baseline viewport and keep major geometry in px.
+45. For Figma-link tasks, avoid introducing extra sections/components not present in the selected Figma node.
+46. For Figma-link tasks, complete an end check at 100% zoom comparing center canvas against Figma screenshot/context.
+47. When center canvas is clipped in default desktop layout, prioritize expanding center column and canvas max-width (or reducing side-panel widths within readable limits) over altering Figma node geometry.
+48. In Figma-link or screenshot restore tasks, all art assets must come from Figma exports/MCP URLs; prohibit agent-invented icons, avatars, illustrations, and decorative graphics.
+49. If a Figma asset is temporarily unavailable, use neutral placeholder blocks only for blocked positions and mark each placeholder explicitly in delivery notes.
 
 ## Resource Usage
 
 1. Read `references/discovery-question-bank.md` for discovery questions.
 2. Read `references/prototype-qa-checklist.md` for QA and acceptance.
 3. Read `references/template-left-tabs-right-annotations.md` for the reusable template contract.
-4. Run `scripts/scaffold_prototype.py` to bootstrap the default reusable template structure.
+4. Read `references/screenshot-restore-spec.md` when screenshot 1:1 restoration is requested.
+5. Read `references/codex-cli-figma-mcp-bootstrap.md` when Codex CLI/Figma MCP setup is requested.
+6. Run `scripts/scaffold_prototype.py` to bootstrap the default reusable template structure.
+7. For Figma-link restoration, use Figma MCP toolchain (`search_design_system`, `get_design_context`, `get_screenshot`, `use_figma` when needed) and prefer design-context structure over manual guessing.
 
 ## Delivery Checklist
 

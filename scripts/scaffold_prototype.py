@@ -8,11 +8,11 @@ import json
 from pathlib import Path
 
 BASE_CSS = """* { box-sizing: border-box; }
-html, body { height: 100%; }
-body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f6fb; color: #1f2937; overflow: hidden; }
+html, body { min-height: 100dvh; }
+body { margin: 0; min-height: 100dvh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f3f6fb; color: #1f2937; overflow: hidden; display: flex; flex-direction: column; }
 .header { height: 56px; display: flex; align-items: center; padding: 0 18px; background: #ffffff; border-bottom: 1px solid #e5e7eb; font-weight: 700; }
-.main { height: calc(100vh - 56px); max-width: 1680px; margin: 0 auto; padding: 12px; }
-.layout { height: 100%; min-height: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr) 360px; gap: 12px; }
+.main { flex: 1; min-height: 0; width: 100%; max-width: 1680px; margin: 0 auto; padding: 12px; display: flex; flex-direction: column; }
+.layout { flex: 1; min-height: 0; display: grid; grid-template-columns: 220px minmax(0, 1fr) 360px; gap: 12px; }
 .panel { background: #ffffff; border-right: 1px solid #e5e7eb; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
 .panel:last-child { border-right: 1px solid #e5e7eb; }
 .panel-title { margin: 0; padding: 12px 14px; border-bottom: 1px solid #eef2f7; font-size: 14px; }
@@ -75,16 +75,9 @@ PAGE_TEMPLATE = """<!doctype html>
         <h2 class=\"panel-title\">Canvas</h2>
         <div class=\"canvas-wrap\">
           <div class=\"canvas\" id=\"canvas-root\">
-            <div class=\"screen\">
-              <div class=\"card\">
-                <h3>{page_name}</h3>
-                <p class=\"note\">TODO: implement page content and key interactions here.</p>
-                <div class=\"actions\">
-                  <a class=\"btn\" href=\"#\">Primary Action</a>
-                  <a class=\"btn secondary\" href=\"#\">Secondary Action</a>
-                </div>
-              </div>
-            </div>
+            <!-- PROTOTYPE_CANVAS_CONTENT_START -->
+            <div class=\"screen\" id=\"prototype-content-root\"></div>
+            <!-- PROTOTYPE_CANVAS_CONTENT_END -->
             <div class=\"annotation-layer\" id=\"annotation-layer\"></div>
           </div>
         </div>
@@ -690,14 +683,9 @@ def create_single_file_project(output_dir: Path, pages: list[str], title: str) -
   )
   page_sections = '\n'.join(
     f'''              <section class="screen-page{" active" if i == 0 else ""}" data-page-key="{p["key"]}">
-                <div class="card">
-                  <h3>{p["name"]}</h3>
-                  <p class="note">TODO: implement page content and key interactions here.</p>
-                  <div class="actions">
-                    <a class="btn" href="#">Primary Action</a>
-                    <a class="btn secondary" href="#">Secondary Action</a>
-                  </div>
-                </div>
+                <!-- PROTOTYPE_CANVAS_CONTENT_START -->
+                <div id="prototype-content-root-{p["key"]}"></div>
+                <!-- PROTOTYPE_CANVAS_CONTENT_END -->
               </section>'''
     for i, p in enumerate(page_defs)
   )
