@@ -38,6 +38,8 @@ Provide a reusable baseline layout for product prototype pages:
 18. Center canvas content area is the full prototype viewport and must not show horizontal or vertical scrollbars.
 19. If prototype content is visually clipped, expand center work area first (increase center column space and/or reduce side columns within usable limits) instead of changing restored page geometry.
 20. In Figma restore mode, visual art resources must use Figma assets (MCP URLs or exported files) only; do not create substitute icons/illustrations/photos manually.
+21. Save defaults must use the currently opened source HTML filename and should not hardcode `prototype.html`.
+22. Save path behavior should prefer the source file directory by reusing `FileSystemFileHandle`; configure a stable `showSaveFilePicker` `id` so the browser can persist last-used directory.
 
 ## Source-of-truth contract
 
@@ -58,6 +60,8 @@ On load, read notes from `#page-annotations`.
 1. Preferred: use File System Access API (`showSaveFilePicker` + `createWritable`) to write updated HTML.
 2. Fallback: if write API is unavailable, export updated HTML as a downloadable file.
 3. Save operation updates only the annotations data block; page structure remains unchanged.
+4. `suggestedName` should derive from the current file path (`location.pathname`), with safe decoding fallback.
+5. Use a stable picker `id` and cached file handle to keep subsequent saves on the same file/path by default.
 
 ## Scaffold output contract
 

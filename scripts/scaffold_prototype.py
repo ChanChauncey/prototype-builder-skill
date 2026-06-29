@@ -160,7 +160,7 @@ ANNOTATIONS_JS = """(function () {
 
   function buildUpdatedHtml() {
     const html = "<!doctype html>\\n" + document.documentElement.outerHTML;
-    const block = '<!-- ANNOTATIONS_DATA_START -->\\n  <script id=\"page-annotations\" type=\"application/json\">' + getAnnotationsJson() + '</script>\\n  <!-- ANNOTATIONS_DATA_END -->';
+    const block = '<!-- ANNOTATIONS_DATA_START -->\\n  <script id=\"page-annotations\" type=\"application/json\">' + getAnnotationsJson() + '</scr' + 'ipt>\\n  <!-- ANNOTATIONS_DATA_END -->';
     return html.replace(/<!-- ANNOTATIONS_DATA_START -->[\\s\\S]*?<!-- ANNOTATIONS_DATA_END -->/, block);
   }
 
@@ -168,7 +168,14 @@ ANNOTATIONS_JS = """(function () {
     const blob = new Blob([buildUpdatedHtml()], { type: "text/html;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    const currentName = location.pathname.split("/").pop() || (pageKey + ".html");
+    const currentName = (function () {
+      try {
+        const pathname = decodeURIComponent(location.pathname || "");
+        return pathname.split("/").pop() || (pageKey + ".html");
+      } catch {
+        return pageKey + ".html";
+      }
+    })();
     a.download = currentName;
     document.body.appendChild(a);
     a.click();
@@ -179,8 +186,16 @@ ANNOTATIONS_JS = """(function () {
   async function ensureFileHandle() {
     if (fileHandle) return fileHandle;
     if (!window.showSaveFilePicker) return null;
-    const currentName = location.pathname.split("/").pop() || (pageKey + ".html");
+    const currentName = (function () {
+      try {
+        const pathname = decodeURIComponent(location.pathname || "");
+        return pathname.split("/").pop() || (pageKey + ".html");
+      } catch {
+        return pageKey + ".html";
+      }
+    })();
     fileHandle = await window.showSaveFilePicker({
+      id: "prototype-builder-save-html",
       suggestedName: currentName,
       types: [{ description: "HTML", accept: { "text/html": [".html"] } }]
     });
@@ -448,6 +463,14 @@ SINGLE_FILE_JS = """(function () {
   let dirty = false;
   let pendingEditIndex = null;
   let notesMap = parseMap(dataNode.textContent || "{}");
+  const currentFileName = (function () {
+    try {
+      const pathname = decodeURIComponent(window.location.pathname || "");
+      const file = pathname.split("/").pop();
+      if (file && /\\.html?$/i.test(file)) return file;
+    } catch {}
+    return "prototype.html";
+  })();
 
   function parseMap(raw) {
     try {
@@ -480,7 +503,7 @@ SINGLE_FILE_JS = """(function () {
     const blob = new Blob([buildUpdatedHtml()], { type: "text/html;charset=utf-8" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "prototype.html";
+    a.download = currentFileName;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -490,7 +513,8 @@ SINGLE_FILE_JS = """(function () {
     if (fileHandle) return fileHandle;
     if (!window.showSaveFilePicker) return null;
     fileHandle = await window.showSaveFilePicker({
-      suggestedName: "prototype.html",
+      id: "prototype-builder-save-html",
+      suggestedName: currentFileName,
       types: [{ description: "HTML", accept: { "text/html": [".html"] } }]
     });
     return fileHandle;

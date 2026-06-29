@@ -112,33 +112,41 @@ When user pastes a Figma URL and asks for 1:1 restoration, run this workflow:
 20. Before every file modification, create a versioned backup in `_backups`.
 21. After every file modification, run a mojibake/encoding check.
 22. If encoding issues are detected, immediately roll back to the latest backup and redo the change from that backup.
-23. If user asks for final delivery artifact, default to a single-file `prototype.html` unless user explicitly asks for multi-file output.
-24. In single-file mode, inline CSS/JS and remove external `link`/`script src` dependencies.
-25. Avoid inline-script termination bugs: never place raw `</script>` string literals inside inline JS; use escaped form like `<\\/script>`.
-26. Add/Edit interaction must be stable: entering edit mode must not collapse immediately from container re-render or bubbling side effects.
-27. Keep annotation edit in-place until explicit `Save`/`Cancel`/`Delete`; no implicit close on generic click.
-28. For delivered output directories, keep only required artifact(s) and move legacy generated files to `_backups`.
-29. Enforce pre-delivery hard checks on final artifact: `.canvas` must use fixed aspect ratio (for example `aspect-ratio: 16 / 9`) and must not use `height: 100%` as marker coordinate reference.
-30. Enforce pre-delivery interaction check: after resize (horizontal and vertical), marker-to-content relative position must remain stable.
-31. Ensure top action row buttons are fully visible in default desktop layout; no truncation of labels such as `Save HTML`.
-32. Treat center canvas as full prototype viewport: disallow horizontal and vertical scrollbars in the canvas content area.
-33. If screenshot 1:1 mode is requested, prioritize structural and visual parity over generic component reuse.
-34. In screenshot 1:1 mode, define viewport, sidebar width, header height, card size, and key offsets with explicit pixels.
-35. In screenshot 1:1 mode, preserve screenshot page information architecture exactly; do not merge pages unless user asks.
-36. In screenshot 1:1 mode, allowed deviation target is <= 2 px on major block edges and <= 1 px on icon/button size when practical.
-37. In screenshot 1:1 mode, if fonts are unavailable locally, choose the nearest fallback and record the gap in delivery notes.
-38. In screenshot 1:1 mode, do not remove the default left-page-tab and right-annotation framework unless the user explicitly disables it.
-39. If screenshot parity conflicts with framework structure, keep the framework and apply 1:1 restoration only inside the center canvas area.
-40. If Figma restoration is required, never auto-install Codex CLI or Figma MCP components.
-41. Require MCP configuration entry `figma-bridge` and use it as the only design-context source.
-42. If user provides a Figma link, prioritize figma-bridge driven restoration over screenshot-only inference.
-43. For Figma-link tasks, implement 1:1 restoration in center canvas first, then adapt peripheral framework.
-44. For Figma-link tasks, treat Figma frame dimensions as baseline viewport and keep major geometry in px.
-45. For Figma-link tasks, avoid introducing extra sections/components not present in the selected Figma node.
-46. For Figma-link tasks, complete an end check at 100% zoom comparing center canvas against Figma screenshot/context.
-47. When center canvas is clipped in default desktop layout, prioritize expanding center column and canvas max-width (or reducing side-panel widths within readable limits) over altering Figma node geometry.
-48. In Figma-link or screenshot restore tasks, all art assets must come from Figma exports/MCP URLs; prohibit agent-invented icons, avatars, illustrations, and decorative graphics.
-49. If a Figma asset is temporarily unavailable, use neutral placeholder blocks only for blocked positions and mark each placeholder explicitly in delivery notes.
+23. After any JS/HTML structural edit, run a script syntax sanity check (for example extract inline JS then `node --check`) before delivery.
+24. For single-file prototypes, verify `window.PROTOTYPE_PAGES` and annotation JSON blocks remain valid JSON/JS literals after edits.
+25. Do not use bulk whole-file re-encoding replacement for content updates (for example raw read/replace/write flows that may change encoding); prefer patch-based scoped edits.
+26. After implementing click handlers, run a conflict audit for global listeners to ensure no higher-priority handler swallows all clicks.
+27. Any page that intercepts outside-click must explicitly exempt actionable controls and must not block global page/tab navigation.
+28. When save/write-back exists in page, perform a post-save interaction regression check: page switch, primary CTA click, menu open/close, and modal confirm/cancel must still work.
+29. If user asks for final delivery artifact, default to a single-file `prototype.html` unless user explicitly asks for multi-file output.
+30. In single-file mode, inline CSS/JS and remove external `link`/`script src` dependencies.
+31. Avoid inline-script termination bugs: never place raw `</script>` string literals inside inline JS; use escaped form like `<\\/script>`.
+32. Add/Edit interaction must be stable: entering edit mode must not collapse immediately from container re-render or bubbling side effects.
+33. Keep annotation edit in-place until explicit `Save`/`Cancel`/`Delete`; no implicit close on generic click.
+34. For delivered output directories, keep only required artifact(s) and move legacy generated files to `_backups`.
+35. Enforce pre-delivery hard checks on final artifact: `.canvas` must use fixed aspect ratio (for example `aspect-ratio: 16 / 9`) and must not use `height: 100%` as marker coordinate reference.
+36. Enforce pre-delivery interaction check: after resize (horizontal and vertical), marker-to-content relative position must remain stable.
+37. Ensure top action row buttons are fully visible in default desktop layout; no truncation of labels such as `Save HTML`.
+38. Treat center canvas as full prototype viewport: disallow horizontal and vertical scrollbars in the canvas content area.
+39. If screenshot 1:1 mode is requested, prioritize structural and visual parity over generic component reuse.
+40. In screenshot 1:1 mode, define viewport, sidebar width, header height, card size, and key offsets with explicit pixels.
+41. In screenshot 1:1 mode, preserve screenshot page information architecture exactly; do not merge pages unless user asks.
+42. In screenshot 1:1 mode, allowed deviation target is <= 2 px on major block edges and <= 1 px on icon/button size when practical.
+43. In screenshot 1:1 mode, if fonts are unavailable locally, choose the nearest fallback and record the gap in delivery notes.
+44. In screenshot 1:1 mode, do not remove the default left-page-tab and right-annotation framework unless the user explicitly disables it.
+45. If screenshot parity conflicts with framework structure, keep the framework and apply 1:1 restoration only inside the center canvas area.
+46. If Figma restoration is required, never auto-install Codex CLI or Figma MCP components.
+47. Require MCP configuration entry `figma-bridge` and use it as the only design-context source.
+48. If user provides a Figma link, prioritize figma-bridge driven restoration over screenshot-only inference.
+49. For Figma-link tasks, implement 1:1 restoration in center canvas first, then adapt peripheral framework.
+50. For Figma-link tasks, treat Figma frame dimensions as baseline viewport and keep major geometry in px.
+51. For Figma-link tasks, avoid introducing extra sections/components not present in the selected Figma node.
+52. For Figma-link tasks, complete an end check at 100% zoom comparing center canvas against Figma screenshot/context.
+53. When center canvas is clipped in default desktop layout, prioritize expanding center column and canvas max-width (or reducing side-panel widths within readable limits) over altering Figma node geometry.
+54. In Figma-link or screenshot restore tasks, all art assets must come from Figma exports/MCP URLs; prohibit agent-invented icons, avatars, illustrations, and decorative graphics.
+55. If a Figma asset is temporarily unavailable, use neutral placeholder blocks only for blocked positions and mark each placeholder explicitly in delivery notes.
+56. Save behavior requirement: default save name must use the currently opened source HTML filename, not a fixed literal like `prototype.html`.
+57. Save location requirement: prioritize writing back to the original file path. Use a stable `showSaveFilePicker` `id` and reuse the obtained `FileSystemFileHandle` so subsequent saves remain in the same directory/file unless user changes it.
 
 ## Resource Usage
 
