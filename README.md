@@ -10,8 +10,14 @@
 - 支持单文件交付（`prototype.html`，内联 CSS/JS）
 - 内置修改安全流程：改前备份到 `_backups`，改后乱码检查
 - 新增截图 1:1 还原流程（中心画布优先）
-- 新增 Figma 链接 1:1 还原流程（基于 Figma MCP）
-- 新增 Codex CLI / Figma MCP 自举指引
+- 新增 Figma 链接 1:1 还原流程（基于 `figma-bridge`）
+- 新增 `figma-bridge` MCP 配置指引
+
+## 本次更新（2026-06-29）
+
+- 移除自动安装 Codex CLI / Figma MCP 的流程要求
+- 改为用户在 Codex MCP 配置中添加 `figma-bridge`
+- 收到 Figma 链接后，优先使用 `figma-bridge` 的 `get_design_context` 还原选中节点
 
 ## 目录结构
 
@@ -35,7 +41,7 @@ prototype-builder/
 
 - Codex（桌面版或支持 skills 的环境）
 - Python 3.9+
-- 需要 Figma 1:1 还原时：可用的 `codex` CLI 与 Figma MCP
+- 需要 Figma 1:1 还原时：已配置的 `figma-bridge` MCP
 
 ## 快速开始
 
@@ -47,14 +53,18 @@ python scripts/scaffold_prototype.py --title "Manual Save Test" --pages Home Upl
 
 ## Figma MCP（可选）
 
-需要做 Figma 链接 1:1 还原时：
+需要做 Figma 链接 1:1 还原时，将以下内容添加到 Codex 的 MCP 配置中：
 
-```bash
-codex mcp add figma --url https://mcp.figma.com/mcp
-codex mcp list
+```json
+{
+  "figma-bridge": {
+    "command": "npx",
+    "args": ["-y", "@gethopp/figma-mcp-bridge"]
+  }
+}
 ```
 
-确认列表中存在 `figma` 即可。
+用户发送 Figma 链接后，优先通过 `figma-bridge` 的 `get_design_context` 对选中节点进行 1:1 还原。
 
 ## 协作约定
 
